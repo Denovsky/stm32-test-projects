@@ -1,0 +1,7 @@
+{
+    "cortex-debug.gdbPath": "arm-none-eabi-gdb",
+    "files.associations": {
+        "main.h": "c",
+        "stm32f4xx_hal.h": "c"
+    }
+}
