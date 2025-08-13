@@ -91,13 +91,14 @@ int main(void)
   RCC->AHB1ENR |= RCC_AHB1ENR_GPIOCEN;
 
   GPIOC->MODER &= ~(0b11 << (2 * 10));
-  GPIOC->MODER |= (0b10 << (2 * 10));
-  GPIOC->OTYPER &= ~(0b1 << (10));
+  GPIOC->MODER |= (0b10 << (2 * 10)); // alternative func for PC10 (20-21)
+
+  GPIOC->OTYPER &= ~(0b1 << (10)); // push-pull PC10
   GPIOC->AFR[1] &= ~(0xF << (2 * 4));
-  GPIOC->AFR[1] |= (GPIO_AF8_UART4 << (2 * 4));
+  GPIOC->AFR[1] |= (GPIO_AF8_UART4 << (2 * 4)); // AFRH AF8:1000 (11-8)
 
   GPIOC->MODER &= ~(0b11 << (2 * 11));
-  GPIOC->MODER |= (0b10 << (2 * 11));
+  GPIOC->MODER |= (0b10 << (2 * 11)); // alternative func for PC11 (23-22)
 
   GPIOC->PUPDR &= ~(0b11 << (2 * 11));
   GPIOC->PUPDR |= (0b01 << (2 * 11));
@@ -106,9 +107,11 @@ int main(void)
 
   UART4->BRR = (104 << 4) | 3;
 
-  UART4->CR1 |= USART_CR1_TE | USART_CR1_RE;
+  UART4->CR1 |= USART_CR1_TE | USART_CR1_RE | USART_CR1_RXNEIE;
   UART4->CR2 &= ~(0b11 << 13);
   UART4->CR3 = 0;
+
+  NVIC_EnableIRQ(UART4_IRQn);
 
   UART4->CR1 |= (0b1 << 13);
 
@@ -121,16 +124,6 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-
-    while ((UART4->SR & USART_SR_RXNE) == 0)
-    {
-    }
-    uint8_t d = UART4->DR;
-
-    while ((UART4->SR & USART_SR_TXE) == 0)
-    {
-    }
-    UART4->DR = d;
   }
   /* USER CODE END 3 */
 }
